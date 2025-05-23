@@ -1,26 +1,29 @@
 const fs = require("fs");
 const pup = require("puppeteer");
 
-const url = "https://www.sympla.com.br/eventos/tecnologia/todos-eventos?page=1";
+const url = "https://www.sympla.com.br/eventos/tecnologia/todos-eventos?page=1"; //link da pagina a ser buscada
 let c = 1;
 const list = [];
 
 (async () => {
-  const browser = await pup.launch({ headless: false }); // Com interface
+  const browser = await pup.launch({ headless: false }); // Com interface, pra eu veer
   const page = await browser.newPage();
   console.log("Iniciado");
 
   await page.goto(url, { waitUntil: "networkidle2" });
   console.log("Página principal carregada");
 
-  const links = await page.$$eval("a.sympla-card", (els) =>
-    els.map((el) => el.href)
+  const links = await page.$$eval(
+    "a.sympla-card",
+    (
+      els //busca o atributo comum e para entrar nas paginas dos eventos
+    ) => els.map((el) => el.href)
   );
 
   for (const link of links) {
     if (link.includes("/play/")) continue;
 
-    console.log(`Entrando no evento ${c}: ${link}`);
+    console.log(`Entrando no evento ${c}: ${link}`); //pega os links, e numera
     await page.goto(link, { waitUntil: "networkidle2" });
 
     const html = await page.content();
@@ -29,14 +32,15 @@ const list = [];
     const latMatch = html.match(regexLat);
     const lngMatch = html.match(regexLng);
     const latitude = latMatch ? latMatch[1] : null;
-    const longitude = lngMatch ? lngMatch[1] : null;
+    const longitude = lngMatch ? lngMatch[1] : null; //rapaz o chat gpt ajudou aqui pra pegar o a loc tofa
 
     let title = null;
     let date = null;
     let location = null;
-    let isPresencial = false;
+    let isPresencial = false; ///vao compor o json
 
     try {
+      //tenta buscar titulo se nao der solta o erro
       title = await page.$eval("h1.sc-57018dea-0.fVgDPM", (el) =>
         el.textContent.trim()
       );
@@ -90,7 +94,7 @@ const list = [];
   }
 
   fs.writeFileSync("eventos.json", JSON.stringify(list, null, 2), "utf-8");
-  console.log("Arquivo JSON salvo como eventos.json");
+  console.log("Arquivo JSON salvo como eventos.json"); //escreve o json
 
   await browser.close();
 })();
