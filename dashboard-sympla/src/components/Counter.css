@@ -1,0 +1,15 @@
+/* src/components/Counter.css */
+.counter-container {
+    background: #5b249e;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    width: 300px;
+    margin: 20px auto;
+}
+
+.counter-number {
+    font-size: 48px;
+    font-weight: bold;
+    color: #3498db;
+}

@@ -1,0 +1,27 @@
+.map-container-wrapper {
+    max-width: 450px;
+    margin: 40px auto;
+    padding: 20px;
+    border: 2px solid #333;
+    border-radius: 16px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+    background-color: #5a1465;
+    overflow: hidden;
+    /* importante para cortar o que ultrapassar os cantos arredondados */
+}
+
+.map-container {
+    width: 400px;
+    height: 400px;
+    margin: auto;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Faz o próprio mapa respeitar o border-radius */
+.map-container .leaflet-container {
+    border-radius: 16px !important;
+    width: 100% !important;
+    height: 100% !important;
+}

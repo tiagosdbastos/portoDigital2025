@@ -1,100 +1,115 @@
-const fs = require("fs");
 const pup = require("puppeteer");
+const db = require("./firebaseconfig");
+const { collection, addDoc } = require("firebase/firestore");
 
-const url = "https://www.sympla.com.br/eventos/tecnologia/todos-eventos?page=1"; //link da pagina a ser buscada
-let c = 1;
-const list = [];
+const baseURL =
+  "https://www.sympla.com.br/eventos/tecnologia/todos-eventos?page=";
 
 (async () => {
-  const browser = await pup.launch({ headless: false }); // Com interface, pra eu veer
+  const browser = await pup.launch({ headless: false });
   const page = await browser.newPage();
   console.log("Iniciado");
 
-  await page.goto(url, { waitUntil: "networkidle2" });
-  console.log("Página principal carregada");
+  let eventCount = 1;
 
-  const links = await page.$$eval(
-    "a.sympla-card",
-    (
-      els //busca o atributo comum e para entrar nas paginas dos eventos
-    ) => els.map((el) => el.href)
-  );
+  // Navega pelas 5 páginas
+  for (let currentPage = 1; currentPage <= 5; currentPage++) {
+    const url = `${baseURL}${currentPage}`;
+    console.log(`Carregando página ${currentPage}: ${url}`);
 
-  for (const link of links) {
-    if (link.includes("/play/")) continue;
+    await page.goto(url, { waitUntil: "networkidle2" });
 
-    console.log(`Entrando no evento ${c}: ${link}`); //pega os links, e numera
-    await page.goto(link, { waitUntil: "networkidle2" });
+    // Pega os links dos eventos da página
+    const links = await page.$$eval("a.sympla-card", (els) =>
+      els.map((el) => el.href)
+    );
 
-    const html = await page.content();
-    const regexLat = /"latitude":\s*([-+]?[0-9]*\.?[0-9]+)/;
-    const regexLng = /"longitude":\s*([-+]?[0-9]*\.?[0-9]+)/;
-    const latMatch = html.match(regexLat);
-    const lngMatch = html.match(regexLng);
-    const latitude = latMatch ? latMatch[1] : null;
-    const longitude = lngMatch ? lngMatch[1] : null; //rapaz o chat gpt ajudou aqui pra pegar o a loc tofa
+    for (const link of links) {
+      if (link.includes("/play/")) continue; // Ignora eventos do tipo play/streaming direto
 
-    let title = null;
-    let date = null;
-    let location = null;
-    let isPresencial = false; ///vao compor o json
+      console.log(`Entrando no evento ${eventCount}: ${link}`);
+      await page.goto(link, { waitUntil: "networkidle2" });
 
-    try {
-      //tenta buscar titulo se nao der solta o erro
-      title = await page.$eval("h1.sc-57018dea-0.fVgDPM", (el) =>
-        el.textContent.trim()
-      );
-    } catch {
-      console.warn(`⚠️ Título não encontrado para ${link}`);
-    }
+      const html = await page.content();
 
-    try {
-      date = await page.$eval("div.sc-57018dea-1.iImKcA > p", (el) =>
-        el.textContent.trim()
-      );
-    } catch {
-      console.warn(`⚠️ Data não encontrada para ${link}`);
-    }
+      // Regex para pegar latitude e longitude
+      const regexLat = /"latitude":\s*([-+]?[0-9]*\.?[0-9]+)/;
+      const regexLng = /"longitude":\s*([-+]?[0-9]*\.?[0-9]+)/;
+      const latMatch = html.match(regexLat);
+      const lngMatch = html.match(regexLng);
+      const latitude = latMatch ? latMatch[1] : null;
+      const longitude = lngMatch ? lngMatch[1] : null;
 
-    try {
-      const tipoEEndereco = await page.$eval(
-        "div.sc-57018dea-1.iImKcA > span",
-        (el) => el.textContent.trim()
-      );
-      isPresencial = tipoEEndereco.toLowerCase().includes("presencial");
-    } catch {
-      console.warn(`⚠️ Tipo do evento não identificado para ${link}`);
-    }
+      let title = null;
+      let date = null;
+      let location = null;
+      let isPresencial = false;
 
-    if (isPresencial) {
+      // Extraindo o título
       try {
-        location = await page.$eval(
-          "div.sc-57018dea-1.iImKcA > span > a",
-          (el) => el.textContent.trim()
+        title = await page.$eval("h1.sc-57018dea-0.fVgDPM", (el) =>
+          el.textContent.trim()
         );
       } catch {
-        console.warn(`⚠️ Local não encontrado para ${link}`);
+        console.warn(`⚠️ Título não encontrado para ${link}`);
       }
-    } else {
-      location = "Sympla Streaming";
+
+      // Extraindo a data
+      try {
+        date = await page.$eval("div.sc-57018dea-1.iImKcA > p", (el) =>
+          el.textContent.trim()
+        );
+      } catch {
+        console.warn(`⚠️ Data não encontrada para ${link}`);
+      }
+
+      // Extraindo tipo e endereço
+      try {
+        const tipoEEndereco = await page.$eval(
+          "div.sc-57018dea-1.iImKcA > span",
+          (el) => el.textContent.trim()
+        );
+        isPresencial = tipoEEndereco.toLowerCase().includes("presencial");
+      } catch {
+        console.warn(`⚠️ Tipo do evento não identificado para ${link}`);
+      }
+
+      if (isPresencial) {
+        try {
+          location = await page.$eval(
+            "div.sc-57018dea-1.iImKcA > span > a",
+            (el) => el.textContent.trim()
+          );
+        } catch {
+          console.warn(`⚠️ Local não encontrado para ${link}`);
+        }
+      } else {
+        location = "Sympla Streaming";
+      }
+
+      const eventObj = {
+        title,
+        date,
+        location,
+        latitude,
+        longitude,
+        link,
+      };
+
+      console.log(eventObj);
+
+      // Salva no Firestore
+      try {
+        await addDoc(collection(db, "eventos"), eventObj);
+        console.log(`✅ Evento ${eventCount} salvo no Firestore`);
+      } catch (error) {
+        console.error(`❌ Erro ao salvar evento ${eventCount}:`, error);
+      }
+
+      eventCount++;
     }
-
-    const obj = {
-      title,
-      date,
-      location,
-      latitude,
-      longitude,
-      link,
-    };
-
-    console.log(obj);
-    list.push(obj);
-    c++;
   }
 
-  fs.writeFileSync("eventos.json", JSON.stringify(list, null, 2), "utf-8");
-  console.log("Arquivo JSON salvo como eventos.json"); //escreve o json
-
+  console.log("Todos os eventos processados!");
   await browser.close();
 })();

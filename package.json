@@ -10,6 +10,16 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "firebase": "^11.8.1",
     "puppeteer": "^24.9.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tiagosdbastos/portoDigital2025.git"
+  },
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/tiagosdbastos/portoDigital2025/issues"
+  },
+  "homepage": "https://github.com/tiagosdbastos/portoDigital2025#readme"
 }

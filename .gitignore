@@ -144,3 +144,7 @@ dist
 # End of https://www.toptal.com/developers/gitignore/api/node
 
 eventos.json
+
+# Arquivos de configuração sensíveis do Firebase
+firebaseconfig.js
+dashboard-sympla/src/services
