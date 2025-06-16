@@ -1,4 +1,75 @@
-.title {
-  min-height: 100vh;
+/* App.css */
+
+.app-container {
+  background-color: #1c1b2f;
+  padding: 40px 50px;
+  border-radius: 20px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+  color: white;
+}
+
+.app-title {
+  font-weight: 700;
+  font-size: 2.5rem;
+  margin-bottom: 40px;
   text-align: center;
+  color: #9f8cff;
+  text-shadow: 0 0 12px #9f8cff88;
+}
+
+.flex-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: space-between;
+  align-items: stretch;
+}
+
+.card {
+  background: #2a2840;
+  padding: 30px;
+  flex: 1;
+  border-radius: 16px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  transition: transform 0.3s ease;
+  overflow: auto;
+  min-height: 280px;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.card-title {
+  text-align: center;
+  font-size: 1.5rem;
+  color: #c2b6ff;
+  margin-bottom: 20px;
+}
+
+.card h2 {
+  margin-top: 0;
+}
+
+/* Botões */
+button {
+  background-color: #9f8cff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  color: #1c1b2f;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+button:hover {
+  background-color: #7d67f5;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .flex-row {
+    flex-direction: column;
+  }
 }
