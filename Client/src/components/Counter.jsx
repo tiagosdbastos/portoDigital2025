@@ -18,9 +18,9 @@ const Counter = () => {
       style={{
         display: "flex",
         flexDirection: "column",
-        justifyContent: "center", // centraliza verticalmente
-        alignItems: "center",     // centraliza horizontalmente
-        height: "200px",          // altura para o número ficar bem no centro
+        justifyContent: "center", 
+        alignItems: "center",     
+        height: "200px",          
       }}
     >
       <h2 style={{ marginBottom: "15px", textAlign: "center" }}>
