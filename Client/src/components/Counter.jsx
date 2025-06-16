@@ -18,14 +18,12 @@ const Counter = () => {
       style={{
         display: "flex",
         flexDirection: "column",
-        justifyContent: "center", 
-        alignItems: "center",     
-        height: "200px",          
+        justifyContent: "center",
+        alignItems: "center",
+        height: "200px",
+        marginTop: 110,
       }}
     >
-      <h2 style={{ marginBottom: "15px", textAlign: "center" }}>
-        Índice 1: Eventos de Inovação & Tecnologia
-      </h2>
       <p
         style={{
           fontSize: "6rem",

@@ -55,9 +55,6 @@ const PieChartEvents = () => {
 
   return (
     <div style={{ width: "100%", height: 300, marginTop: 40 }}>
-      <h2 style={{ textAlign: "center" }}>
-        Índice 2: Distribuição Online vs. Presencial
-      </h2>
       <ResponsiveContainer>
         <PieChart>
           <Pie

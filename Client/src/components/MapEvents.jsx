@@ -53,9 +53,20 @@ const MapEvents = () => {
 
   return (
     <>
-      <h2 style={{ marginBottom: "15px" }}>Índice 3: Mapa dos Eventos</h2>
-      <div style={{ width: "100%", height: "400px", borderRadius: "16px", overflow: "hidden", boxShadow: "0 0 8px rgba(0, 0, 0, 0.1)" }}>
-        <MapContainer center={center} zoom={4} style={{ height: "100%", width: "100%" }}>
+      <div
+        style={{
+          width: "100%",
+          height: "400px",
+          borderRadius: "16px",
+          overflow: "hidden",
+          boxShadow: "0 0 8px rgba(0, 0, 0, 0.1)",
+        }}
+      >
+        <MapContainer
+          center={center}
+          zoom={4}
+          style={{ height: "100%", width: "100%" }}
+        >
           <TileLayer
             attribution='&copy; <a href="https://osm.org/copyright">OpenStreetMap</a>'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -67,7 +78,9 @@ const MapEvents = () => {
                 <br />
                 {event.location}
                 <br />
-                <a href={event.link} target="_blank" rel="noreferrer">Ver evento</a>
+                <a href={event.link} target="_blank" rel="noreferrer">
+                  Ver evento
+                </a>
               </Popup>
             </Marker>
           ))}
